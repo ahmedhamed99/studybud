@@ -1,0 +1,53 @@
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+
+# Create your models here.
+
+class User(AbstractUser):
+    name = models.CharField(max_length=200,null=True)
+    email = models.EmailField(unique=True,null=True)
+    bio = models.TextField(null=True,blank=True)
+    avatar = models.ImageField(null=True,default='avatar.svg')
+    followers = models.ManyToManyField('User',blank=True,related_name="followings_info")
+    followings = models.ManyToManyField('User',blank=True,related_name="followers_info")
+
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS  = []
+
+class Topic(models.Model):
+    name = models.CharField(max_length=200)
+    followers = models.ManyToManyField(User,blank=True,related_name="followedtopics")
+    
+    def __str__(self):
+        return self.name
+
+class Room(models.Model):
+    host = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,related_name='hostedrooms')
+    topic = models.ForeignKey(Topic,on_delete=models.SET_NULL,null=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(null=True,blank=True)
+    participants = models.ManyToManyField(User,blank=True,related_name='joinedrooms')
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-updated','-created']
+
+    def __str__(self):
+        return self.name
+    
+class Message(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="usermessages")
+    room = models.ForeignKey(Room,on_delete=models.CASCADE,related_name="messages")
+    body = models.TextField()
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-updated','-created']
+
+    def __str__(self):
+        return self.body[0:50]
+    

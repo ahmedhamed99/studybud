@@ -1,0 +1,14 @@
+asgiref
+autopep8
+Django
+django-cors-headers
+djangorestframework
+Pillow
+psycopg2-binary
+pycodestyle
+pytz
+sqlparse
+toml
+gunicorn
+django-heroku
+whitenoise
